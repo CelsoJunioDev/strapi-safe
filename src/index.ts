@@ -1,20 +1,29 @@
-// import type { Core } from '@strapi/strapi';
-
 export default {
-  /**
-   * An asynchronous register function that runs before
-   * your application is initialized.
-   *
-   * This gives you an opportunity to extend code.
-   */
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register() { },
 
-  /**
-   * An asynchronous bootstrap function that runs before
-   * your application gets started.
-   *
-   * This gives you an opportunity to set up your data model,
-   * run jobs, or perform some special logic.
-   */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+  bootstrap({ strapi }) {
+    strapi.server.routes([
+      {
+        method: 'GET',
+        path: '/api/posts/slug/:slug',
+        handler: async (ctx) => {
+          const { slug } = ctx.params;
+
+          const post = await strapi.db.query('api::post.post').findOne({
+            where: { slug },
+            populate: ['featuredImage', 'category'], // ajuste os relacionamentos aqui
+          });
+
+          if (!post) {
+            return ctx.notFound('Post não encontrado');
+          }
+
+          ctx.body = post;
+        },
+        config: {
+          auth: false, // ou true se quiser proteger
+        },
+      },
+    ]);
+  },
 };
