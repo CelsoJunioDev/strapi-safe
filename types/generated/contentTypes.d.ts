@@ -382,7 +382,7 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
     singularName: 'post';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     category: Schema.Attribute.String;
